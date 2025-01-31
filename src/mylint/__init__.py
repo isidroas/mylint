@@ -79,11 +79,10 @@ class SetDuplicateItemChecker(Checker):
                 seen_values.add(element.value)
 
 
-class UnusedVariableInScopeChecker(Checker):
+class UnusedVariableInScopeChecker(ast.NodeVisitor):
     """Checks if any variables are unused in this node's scope."""
 
-    def __init__(self, issue_code: str) -> None:
-        super().__init__(issue_code)
+    def __init__(self) -> None:
         # unused_names is a dictionary that stores variable names, and
         # whether or not they've been found in a "Load" context yet.
         # If it's found to be used, its value is turned to False.
@@ -113,7 +112,7 @@ class UnusedVariableInScopeChecker(Checker):
 class UnusedVariableChecker(Checker):
     def check_for_unused_variables(self, node: ast.AST) -> None:
         """Find unused variables in the local scope of this node."""
-        visitor = UnusedVariableInScopeChecker(self.issue_code)
+        visitor = UnusedVariableInScopeChecker()
         visitor.visit(node)
 
         for name, unused in visitor.unused_names.items():
